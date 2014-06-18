@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * @file
+ * Install file for jQuery Update.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
