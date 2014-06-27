@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * @file
+ * Updates Drupal to use the latest version of jQuery.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function greenhouse_menu() {
+        $items['greenhouse/sensor'] = array(
+                'title'=>'Sensors',
+                'page callback' => 'greenhouse_add_sensor',
+                'access arguments' => array('Add delete Sensor'),
+                'menu_name' => 'main-menu',
+            );
+         $items['greenhouse/information'] = array(
+                'title'=>'Infomation',
+                'page callback' => 'greenhouse_infomation',
+                'access arguments' => array('View sensor data'),
+                'menu_name' => 'main-menu',
+            );
+        return $items;
+}
+
+function greenhouse_infomation() {
+    // show general infomation
+    $sensor = greenhouse_get_sensor_array();
+    $data = greenhouse_day_info();
+    
+    //Display chart;
+    $display = "<div class=\"day_info\">";
+    foreach ($sensor as $name => $sensor_info) {
+        $display .= "<div class=\"current_info_sensor well\">";
+        $display .= "<h4>".$name."</h4>";
+        $sensor_data = $data[$name];
+        
+        foreach ($sensor_data as $key => $value) {
+            $display .="<h5>".$key."</h5>";
+            $rows = array();
+            foreach ($value as $time => $value) {
+                $rows[] = array($time,$value);
+            }
+            
+            $id = str_replace(' ', '_', $key);
+            $chart = array(
+                'id' => 'visualization_'.$id,
+                'type' => 'LineGraph',
+                'legend' => array($key),
+                'rows' => $rows,
+                );
+            $display .= d3_draw($chart);
+        }
+        $display .= "</div>";
+    }
+    $display .= "<p>view more</p>";
+    $display .= "</div>";
+    return $display;
+
+}
+
+function greenhouse_day_info() {
+    return array(
+        "validity" => array("soil tempreture" =>
+            array("00:00" => 1,
+            "01:00" => 2,
+            "02:00" => 3,
+            "03:00" => 4,
+            "04:00" => 4,
+            "05:00" => 5,
+            "06:00" => 4,
+            "07:00" => 3,
+            "08:00" => 2,
+            "09:00" => 3,
+            "10:00" => 5,
+            "11:00" => 7,
+            "12:00" => 8,
+            "13:00" => 7,
+            "14:00" => 6,
+            "15:00" => 5,
+            "16:00" => 5,
+            "17:00" => 5,
+            "18:00" => 4,
+            "19:00" => 3,
+            "20:00" => 3,
+            "21:00" => 4,
+            "22:00" => 3,
+            "23:00" => 4,
+                ),
+            ),
+        "tempture" => array('tempreture'=>
+            array("00:00" => 25,
+            "01:00" => 23,
+            "02:00" => 34,
+            "03:00" => 24,
+            "04:00" => 24,
+            "05:00" => 25,
+            "06:00" => 24,
+            "07:00" => 30,
+            "08:00" => 22,
+            "09:00" => 23,
+            "10:00" => 25,
+            "11:00" => 27,
+            "12:00" => 28,
+            "13:00" => 27,
+            "14:00" => 26,
+            "15:00" => 25,
+            "16:00" => 25,
+            "17:00" => 25,
+            "18:00" => 24,
+            "19:00" => 23,
+            "20:00" => 23,
+            "21:00" => 24,
+            "22:00" => 23,
+            "23:00" => 24,
+            ),
+         ),
+    );
+}
+function greenhouse_add_sensor() {
+    $display = "<div class=\"add_sensor_form well\">";
+    $add_form = greenhouse_addsensor_form();
+    $display .= drupal_render($add_form);
+    $display .= "</div>";
+    // add sensor form
+    
+    //show cureent sensors.
+    $sensors = greenhouse_get_sensor_array();
+    foreach($sensors as $sensor => $info) {
+        $display .= '<div class="sensor_infomation well"> <ul>';
+        foreach($info as $infoname => $infoitem) {
+            $display .= "<li> <b>".$infoname."</b>:".$infoitem."</li>";
+        }
+        $display .= "<ul></div>";
+    }
+    return $display;
+}
+
+function greenhouse_get_sensor_array() {
+    return array(
+        "validity" => array("SensorName" => "validity",
+            "discription"=>"test"),
+        "tempture" => array("SensorName" => "tempture",
+            "discription"=>"test2"),
+    );
+}
+
+function greenhouse_addsensor_form() {
+    $form = array();
+    $form['title'] = array(
+          '#type' => 'textfield', 
+          '#title' => t('Subject'), 
+          '#default_value' => '',
+          '#value' => '',
+          '#size' => 60, 
+          '#maxlength' => 128, 
+          '#required' => TRUE,);
+    $form['keywords'] = array(
+        '#title' => t('Discription'),
+        '#type' => 'textarea',
+        '#value' => '',
+        '#description' => t('The sensor discription'),
+        '#default_value' => '',
+        );
+    $form['add'] = array(
+        '#type' => 'button', 
+        '#value' => t('Add'),
+        );
+    return $form;
+}
+
+
+
+function greenhouse_permission() {
+  return array(
+    'Add delete Sensor' => array(
+      'description' => t('Add an sensor'),
+      'title' => t('Add/delete Sensor'),
+      'restrict access' => TRUE,
+    ),
+    'View sensor data' => array(
+      'description' => t('View sensor data'),
+      'title' => t('View sensor data'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
