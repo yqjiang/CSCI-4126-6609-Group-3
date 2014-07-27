@@ -3,5 +3,7 @@ description = The green house in course Ubicomp
 package = Ubicomp
 core = 7.x
 
-
+files[] = forms/admin.setting.inc
+files[] = forms/add_sensor.inc
+files[] = forms/greenhouse_resttest.inc
 

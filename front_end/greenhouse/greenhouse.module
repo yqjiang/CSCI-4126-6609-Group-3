@@ -9,401 +9,90 @@
  * Implements hook_help().
  */
 function greenhouse_menu() {
-        $items['greenhouse/sensor'] = array(
-                'title'=>'Sensors',
-                'page callback' => 'greenhouse_add_sensor',
-                'access arguments' => array('Add delete Sensor'),
-                'menu_name' => 'main-menu',
-            );
-         $items['greenhouse/information'] = array(
-                'title'=>'Infomation',
-                'page callback' => 'greenhouse_infomation',
-                'access arguments' => array('View sensor data'),
-                'menu_name' => 'main-menu',
-            );
-        return $items;
-}
-
-function greenhouse_infomation() {
-    // show general infomation
-    $sensor = greenhouse_get_sensor_array();
-    $data = greenhouse_day_info();
-    $current_info = greenhouse_current_info();
-    $display = "<div class=\"current_info highlighted-block light\">";
-    $display .= "<h3>Current Info</h2>";
-    foreach($current_info as $sensor_title => $sensor_data) {
-        $display .= "<div class=\"col-md-6\">";
-        $display .= "<h3>".$sensor_title."</h4>";
-        
-        foreach ($sensor_data as $data_title => $data_data) {
-            $display .= "<p><b>".$data_title.": </b>".$data_data."</p>";
-        }
-        $display .= "</div>";
-    }
-    $display .= "<div class=\"col-md-6\"><p><a class=\"btn\" >See the tasks</a></p></div>";
-
-    $display .= "</div><p>&nbsp</p>";
+    $items['greenhouse/sensors'] = array(
+        'title' => 'Sensors',
+        'page callback' => 'greenhouse_sensor',
+        'file' =>'includes/sensor.inc',
+        'menu_name' => 'main-menu',
+        'access arguments' => array('Add delete Sensor'),
+        'weight' => 20
+    );
     
-    //Display chart;
-    $display .= "<div class=\"day_info\">";
-    foreach ($sensor as $name => $sensor_info) {
-        $display .= "<div class=\"current_info_sensor highlighted-block light\">";
-        $display .= "<div class=\"row\"><div class=\"col-md-9\"><h4>".$name."</h4></div>";
-        $display .= "<div class=\"col-md-3\"><p><a class=\"btn\" >view more</a></p></div></div>";
-        $sensor_data = $data[$name];
-        
-        foreach ($sensor_data as $key => $value) {
-            $display .="<div class=\"col-md-12\"><h5>".$key."</h5>";
-            $rows = array();
-            $display .= greenhouse_get_single_line_graph($key,$value);
-            $display .= "</div>";
-        }
-        $display .= "</div>";
-        $display .= "<p>&nbsp</p>";
-    }
-
-    $display .= "</div>";
-    return $display;
-}
-
-function greenhouse_get_single_line_graph($name,$data) {
-            foreach ($data as $time => $value) {
-                $rows[] = array($time,$value);
-            }
-            
-            $id = str_replace(' ', '_', $name);
-            $chart = array(
-                'id' => 'visualization_'.$id,
-                'type' => 'LineGraph',
-                'legend' => array($name),
-                'rows' => $rows,
-                );
-            $display = d3_draw($chart);
-            return $display;
-}
-
-function greenhouse_current_info() {
-    return array(
-        "Ambient Sensor" => array("tempreture" => 1,
-           'Humidity'=> 25,
-            ),
-        "Soil Sensor" => array("Soil tempreture" =>1,
-            'light'=> 24,
-         ),
+    $items['greenhouse/power'] = array(
+        'title' => 'Power',
+        'page callback' => 'greenhouse_power',
+        'file' =>'includes/power.inc',
+        'menu_name' => 'main-menu',
+        'access arguments' => array('Add delete Sensor'),
+        'weight' => 25
     );
-}
-
-function greenhouse_day_info() {
-    return array(
-        "Ambient Sensor" => array("tempreture" =>
-            array("00:00" => 1,
-            "01:00" => 2,
-            "02:00" => 3,
-            "03:00" => 4,
-            "04:00" => 4,
-            "05:00" => 5,
-            "06:00" => 4,
-            "07:00" => 3,
-            "08:00" => 2,
-            "09:00" => 3,
-            "10:00" => 5,
-            "11:00" => 7,
-            "12:00" => 8,
-            "13:00" => 7,
-            "14:00" => 6,
-            "15:00" => 5,
-            "16:00" => 5,
-            "17:00" => 5,
-            "18:00" => 4,
-            "19:00" => 3,
-            "20:00" => 3,
-            "21:00" => 4,
-            "22:00" => 3,
-            "23:00" => 4,
-                ),
-           'Humidity'=>
-            array("00:00" => 25,
-            "01:00" => 23,
-            "02:00" => 34,
-            "03:00" => 24,
-            "04:00" => 24,
-            "05:00" => 25,
-            "06:00" => 24,
-            "07:00" => 30,
-            "08:00" => 22,
-            "09:00" => 23,
-            "10:00" => 25,
-            "11:00" => 27,
-            "12:00" => 28,
-            "13:00" => 27,
-            "14:00" => 26,
-            "15:00" => 25,
-            "16:00" => 25,
-            "17:00" => 25,
-            "18:00" => 24,
-            "19:00" => 23,
-            "20:00" => 23,
-            "21:00" => 24,
-            "22:00" => 23,
-            "23:00" => 24,
-            ),
-         ),
-        "Soil Sensor" => array("Soil tempreture" =>
-            array("00:00" => 1,
-            "01:00" => 2,
-            "02:00" => 3,
-            "03:00" => 4,
-            "04:00" => 4,
-            "05:00" => 5,
-            "06:00" => 4,
-            "07:00" => 3,
-            "08:00" => 2,
-            "09:00" => 3,
-            "10:00" => 5,
-            "11:00" => 7,
-            "12:00" => 8,
-            "13:00" => 7,
-            "14:00" => 6,
-            "15:00" => 5,
-            "16:00" => 5,
-            "17:00" => 5,
-            "18:00" => 4,
-            "19:00" => 3,
-            "20:00" => 3,
-            "21:00" => 4,
-            "22:00" => 3,
-            "23:00" => 4,
-                ),
-        'light'=>
-            array("00:00" => 25,
-            "01:00" => 23,
-            "02:00" => 34,
-            "03:00" => 24,
-            "04:00" => 24,
-            "05:00" => 25,
-            "06:00" => 24,
-            "07:00" => 30,
-            "08:00" => 22,
-            "09:00" => 23,
-            "10:00" => 25,
-            "11:00" => 27,
-            "12:00" => 28,
-            "13:00" => 27,
-            "14:00" => 26,
-            "15:00" => 25,
-            "16:00" => 25,
-            "17:00" => 25,
-            "18:00" => 24,
-            "19:00" => 23,
-            "20:00" => 23,
-            "21:00" => 24,
-            "22:00" => 23,
-            "23:00" => 24,
-            ),
-         ),
-    );
-}
-
-function greenhouse_add_sensor() {
-    $display = "<div class=\"add_sensor_form highlighted-block light\">";
-    $add_form = drupal_get_form('greenhouse_addsensor_form');
-    $display .= drupal_render($add_form);
-    $display .= "</div><p></p>";
-    // add sensor form
     
-    //show cureent sensors.
-    $sensors = greenhouse_get_sensor_array();
-    foreach($sensors as $sensor => $info) {
-        $display .= '<div class="sensor_infomation highlighted-block light">'
-                . '<div class="row"><div class="col-md-8">'
-                . '<h5>'
-                . $sensor
-                . '</h5></div>'
-                . '<div class="col-md-2">'
-                . '<a class="btn">Edit</a>'
-                . '</div>'
-                . '<div class="col-md-2">'
-                . '<a class="btn">Delete</a></div>'
-                . '</div>'
-                . '<ul>';
-        foreach($info as $infoname => $infoitem) {
-            if(!is_array($infoitem)){
-                 $display .= "<li> <b>".$infoname."</b>:".$infoitem."</li>";
-            }
-        }
-        $display .= "</ul>";
-        if(isset($info['data'])) {
-            $display .= greenhouse_get_sensor_data_table($info['data']);
-        }
-        $display .= "</div>"
-                . "<p></p>";
-    }
-    return $display;
-}
-
-function greenhouse_get_sensor_data_table($data) {
-    $display = '<table class="table table-condensed">';
-    $title_array = array("title","type","upper_bound","lower_bound","related motor");
-    $display .= '<tr>';
-    foreach ($title_array as $title) {
-        $display .= '<th>';
-        $display .= $title;
-        $display .= '</th>';
-    }
-    $display .= '</tr>';
-    foreach ($data as $item_title => $item) {
-        $display .= '<tr>';
-        foreach ($title_array as $title) {
-            if(isset($item[$title])){
-                $display .= "<td>".$item[$title]."</td>";
-            }
-            else {
-                $display .= "<td>NULL</td>";
-            }
-        }
-        $display .= '</tr>';
-    }
-    $display .= "</table>";
-    return $display;
-}
-
-function greenhouse_get_sensor_array() {
-    return array(
-        "Ambient Sensor" => array("SensorName" => "validity",
-            "discription"=>"test",
-            "data" => array (
-                'tempreture' => array(
-                    "title" => 'tempreture' ,
-                    "type" => 'int',
-                    "upper_bound" => 25,
-                    "lower_bound" => 20,
-                    "related motor" => 'Heater'),
-                'Humidity' => array(
-                    "title" => 'Humidity' ,
-                    "type" => 'int',
-                    "upper_bound" => 25,
-                    "lower_bound" => 20,
-                    )
-                ),
-            ),
-        "Soil Sensor" => array("SensorName" => "tempture",
-            "discription"=>"test2"),
+    $items['greenhouse/power/delete/%'] = array(
+        'title' => 'Delete',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('greenhouse_delete_power',3),
+        'file' =>'includes/power.inc',
+        'access arguments' => array('Add delete Sensor'),
     );
-}
-
-function greenhouse_addsensor_form() {
-    $form = array();
-    $form['title'] = array(
-          '#type' => 'textfield', 
-          '#title' => t('Subject'), 
-          '#default_value' => '',
-          '#value' => '',
-          '#size' => 60, 
-          '#maxlength' => 128, 
-          '#required' => TRUE,);
-    $form['discription'] = array(
-        '#title' => t('Discription'),
-        '#type' => 'textarea',
-        '#value' => '',
-        '#description' => t('The sensor discription'),
-        '#default_value' => '',
-        );
-    $form['#tree'] = true;
+    
+    $items['greenhouse/sensors/delete/%'] = array(
+        'title' => 'Delete',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('greenhouse_delete_sensor',3),
+        'file' =>'includes/sensor.inc',
+        'access arguments' => array('Add delete Sensor'),
+        'weight' => 25
+    );
+    
+    $items['greenhouse/sensor/update/%'] = array(
+        'title' => 'Edit Sensor',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('greenhouse_update_sensor',3),
+        'file' =>'includes/sensor.inc',
+        'access arguments' => array('Add delete Sensor'),
+    );
  
-    $form['num_of_data']= array(
-       '#type' => 'select',
-       '#title' => t('Numbers of dataset'),
-       '#options' => array(
-          0 => t('0'),
-          1 => t('1'),
-          2 => t('2'),
-          3 => t('3'),
-          4 => t('4'),
-          5 => t('5'),
-          6 => t('6'),
-          7 => t('7'),
-          8 => t('8'),
-          9 => t('9'),
-          10 => t('10'),
-       ),
-       '#default_value' => 0,
-       '#ajax' => array(
-            'callback' => 'greenhouse_sensor_data_ajax_callback',
-            'wrapper' => 'greenhouse_sensor_data_ajax_wrapper',
-             )
+     $items['greenhouse/power/update/%'] = array(
+        'title' => 'Edit Power',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('greenhouse_update_power',3),
+        'file' =>'includes/power.inc',
+        'access arguments' => array('Add delete Sensor'),
     );
-
-
-    $form['data'] = array(
-        '#type' => 'markup', 
-        '#prefix' => '<div id="greenhouse_sensor_data_ajax_wrapper">',
-        '#suffix' => '</div>'
-    );
-    $form['add'] = array(
-        '#type' => 'submit', 
-        '#value' => t('Add'),
-    );
-    return $form;
-}
-
-function greenhouse_sensor_data_ajax_callback($form,$form_state){
     
-    $data_field = array(
-        '#type' => 'fieldset', 
-        '#title' => t('Data Set'), 
-        '#collapsible' => FALSE, 
-        '#prefix' => '<div id="greenhouse_sensor_data_ajax_wrapper">',
-        '#suffix' => '</div>',
+    $items['greenhouse/information'] = array(
+        'title' => 'Infomation',
+        'page callback' => 'greenhouse_infomation',
+        'access arguments' => array('View sensor data'),
+        'file' =>'includes/information.inc',
+        'menu_name' => 'main-menu',
     );
-    $data_field['title'] = array(
-          '#type' => 'textfield', 
-          '#title' => t('Data title'), 
-          '#default_value' => '',
-          '#value' => '',
-          '#size' => 60, 
-          '#maxlength' => 128, 
-          '#required' => TRUE,);
-    $data_field['type'] = array(
-       '#type' => 'select',
-       '#title' => t('Data type'),
-       '#options' => array(
-          0 => t('int'),
-          1 => t('float'),
-       ),
-       '#default_value' => 0,
+    
+    $items['greenhouse/information/sensors/%'] = array(
+        'title' => 'More Infomation',
+        'file' =>'includes/information.inc',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('greenhouse_infomation_sensor_date_form',3),
+        'access arguments' => array('View sensor data'),
     );
-    $data_field['unittype'] = array(
-          '#type' => 'textfield', 
-          '#title' => t('Unit type'), 
-          '#default_value' => '',
-          '#value' => '',
-          '#size' => 60, 
-          '#maxlength' => 128, 
-       );
-    $data_field['upbound'] = array(
-          '#type' => 'textfield', 
-          '#title' => t('Upper Bound'), 
-          '#default_value' => '',
-          '#value' => '',
-          '#size' => 60, 
-          '#maxlength' => 128, 
+    
+    $items['greenhouse/information/sensors/data/%/%/%'] = array(
+        'title' => 'More Infomation',
+        'file' =>'includes/information.inc',
+        'page callback' => 'greenhouse_infomation_sensor_viewmore',
+        'page arguments' => array(4,5,6),
+        'access arguments' => array('View sensor data'),
     );
-    $data_field['lobound'] = array(
-          '#type' => 'textfield', 
-          '#title' => t('Lower Bound'), 
-          '#default_value' => '',
-          '#value' => '',
-          '#size' => 60, 
-          '#maxlength' => 128, 
+        
+    $items['admin/config/system/greenhouse'] = array(
+        'title' => 'Greenhouse settings',
+        'page callback' => 'greenhouse_settings',
+        'file' =>'includes/admin.setting.inc',
+        'access arguments' => array('Change Setting'),
     );
-    for($i =0;$i<$form['num_of_data']['#value'];$i++) $form['data'][] = $data_field;
-    return $form['data'];
+    return $items;
 }
 
-
-function greenhouse_addsensor_form_submit($form, &$form_state) {
-    drupal_set_message(t('No back ground program running. Will do it in phase 2'), 'error');
-}
 
 function greenhouse_permission() {
   return array(
@@ -415,6 +104,11 @@ function greenhouse_permission() {
     'View sensor data' => array(
       'description' => t('View sensor data'),
       'title' => t('View sensor data'),
+      'restrict access' => TRUE,
+    ),
+    'Change Setting' => array(
+      'description' => t('Change Setting'),
+      'title' => t('Change Setting'),
       'restrict access' => TRUE,
     ),
   );

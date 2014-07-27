@@ -8,3 +8,12 @@
 /**
  * Implements hook_requirements().
  */
+function greenhouse_install() {
+    variable_set('greenhouse_rest_api', 'https://projects.cs.dal.ca/greenhouse/rest_api/');
+    variable_set('greenhouse_smart_scheduler','https://projects.cs.dal.ca/greenhouse/task/');
+}
+
+function greenhouse_uninstall() {
+    variable_del('greenhouse_rest_api');
+    variable_del('greenhouse_smart_scheduler');
+}
